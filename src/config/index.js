@@ -1,4 +1,3 @@
-require('dotenv').config()
 const path = require('path')
 const _ = require('lodash')
 const knexfile = require('./knexfile')
@@ -12,7 +11,7 @@ const isDev = NODE_ENV === 'development'
 
 module.exports = {
   server: {
-    port: _.defaultTo(process.env.PORT, 3000),
+    port: normalizePort(_.defaultTo(process.env.PORT, 3000)),
     host: _.defaultTo(process.env.HOST, 'localhost'),
     root: ROOT,
     data: path.join(ROOT, '../', '/data')
@@ -46,4 +45,18 @@ module.exports = {
   jwtOptions: {
     expiresIn: '7d'
   }
+}
+
+function normalizePort (val) {
+  var port = parseInt(val, 10)
+
+  if (isNaN(port)) {
+    return val
+  }
+
+  if (port >= 0) {
+    return port
+  }
+
+  return false
 }
