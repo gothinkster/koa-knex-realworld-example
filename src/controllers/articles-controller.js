@@ -102,7 +102,7 @@ module.exports = {
       .offset(offset)
       .orderBy('articles.created_at', 'desc')
 
-    let conutQuery = ctx.app.db('articles').count()
+    let countQuery = ctx.app.db('articles').count()
 
     if (author && author.length > 0) {
       const subQuery = ctx.app.db('users')
@@ -110,7 +110,7 @@ module.exports = {
         .whereIn('username', author)
 
       articlesQuery = articlesQuery.andWhere('articles.author', 'in', subQuery)
-      conutQuery = conutQuery.andWhere('articles.author', 'in', subQuery)
+      countQuery = countQuery.andWhere('articles.author', 'in', subQuery)
     }
 
     if (favorited && favorited.length > 0) {
@@ -122,7 +122,7 @@ module.exports = {
         )
 
       articlesQuery = articlesQuery.andWhere('articles.id', 'in', subQuery)
-      conutQuery = conutQuery.andWhere('articles.id', 'in', subQuery)
+      countQuery = countQuery.andWhere('articles.id', 'in', subQuery)
     }
 
     if (tag && tag.length > 0) {
@@ -134,7 +134,7 @@ module.exports = {
         )
 
       articlesQuery = articlesQuery.andWhere('articles.id', 'in', subQuery)
-      conutQuery = conutQuery.andWhere('articles.id', 'in', subQuery)
+      countQuery = countQuery.andWhere('articles.id', 'in', subQuery)
     }
 
     articlesQuery = articlesQuery
@@ -150,7 +150,7 @@ module.exports = {
           .onIn('followers.follower', [user && user.id])
       })
 
-    let [articles, [countRes]] = await Promise.all([articlesQuery, conutQuery])
+    let [articles, [countRes]] = await Promise.all([articlesQuery, countQuery])
 
     articles = joinJs
       .map(articles, relationsMaps, 'articleMap', 'article_')
