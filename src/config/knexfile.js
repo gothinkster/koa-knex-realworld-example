@@ -30,11 +30,11 @@ module.exports = {
   development: Object.assign({}, options),
 
   test: Object.assign({}, options, {
-    connection: DB_CONNECTION || path.join(ROOT, 'data/test.sqlite3')
+    connection: DB_CONNECTION || { filename: path.join(ROOT, 'data/test.sqlite3') }
   }),
 
   production: Object.assign({}, options, {
-    connection: DB_CONNECTION || path.join(ROOT, 'data/prod.sqlite3')
+    connection: DB_CONNECTION || { filename: path.join(ROOT, 'data/prod.sqlite3') }
   })
 
 }
