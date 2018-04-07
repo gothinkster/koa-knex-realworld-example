@@ -6,7 +6,7 @@ const {DB_CLIENT, DB_CONNECTION} = process.env
 
 const options = {
   client: DB_CLIENT || 'sqlite3',
-  connection: DB_CONNECTION || path.join(ROOT, 'data/dev.sqlite3'),
+  connection: DB_CONNECTION || { filename: path.join(ROOT, 'data/dev.sqlite3') },
   migrations: {
     directory: path.join(ROOT, 'src/migrations'),
     tableName: 'migrations'
