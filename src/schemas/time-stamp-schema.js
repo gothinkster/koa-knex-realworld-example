@@ -1,5 +1,5 @@
 const yup = require('yup')
-const isISO8601 = require('validator/lib/isISO8601').default
+const isISO8601 = require('validator/lib/isISO8601')
 
 const timeStampsSchema = yup.object().shape({
 
