@@ -24,10 +24,10 @@ const relationsMaps = [
     idProperty: 'id',
     properties: [...articleFields, 'favorited'],
     associations: [
-      {name: 'author', mapId: 'userMap', columnPrefix: 'author_'}
+      { name: 'author', mapId: 'userMap', columnPrefix: 'author_' }
     ],
     collections: [
-      {name: 'tagList', mapId: 'tagMap', columnPrefix: 'tag_'}
+      { name: 'tagList', mapId: 'tagMap', columnPrefix: 'tag_' }
     ]
   },
   {
@@ -35,7 +35,7 @@ const relationsMaps = [
     idProperty: 'id',
     properties: [...commentFields],
     associations: [
-      {name: 'author', mapId: 'userMap', columnPrefix: 'author_'}
+      { name: 'author', mapId: 'userMap', columnPrefix: 'author_' }
     ]
   },
   {

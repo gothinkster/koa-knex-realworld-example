@@ -3,10 +3,10 @@ const uuid = require('uuid')
 const humps = require('humps')
 const _ = require('lodash')
 const comments = require('./comments-controller')
-const {ValidationError} = require('lib/errors')
+const { ValidationError } = require('lib/errors')
 
-const {getSelect} = require('lib/utils')
-const {articleFields, userFields, relationsMaps} = require('lib/relations-map')
+const { getSelect } = require('lib/utils')
+const { articleFields, userFields, relationsMaps } = require('lib/relations-map')
 const joinJs = require('join-js').default
 
 module.exports = {
@@ -18,7 +18,7 @@ module.exports = {
 
     const article = await ctx.app.db('articles')
       .first()
-      .where({slug})
+      .where({ slug })
 
     if (!article) {
       ctx.throw(404)
@@ -26,7 +26,7 @@ module.exports = {
 
     const tagsRelations = await ctx.app.db('articles_tags')
       .select()
-      .where({article: article.id})
+      .where({ article: article.id })
 
     let tagList = []
 
@@ -44,17 +44,17 @@ module.exports = {
 
     const author = await ctx.app.db('users')
       .first('username', 'bio', 'image', 'id')
-      .where({id: article.author})
+      .where({ id: article.author })
 
     article.author = author
 
     article.author.following = false
 
-    const {user} = ctx.state
+    const { user } = ctx.state
 
     if (user && user.username !== article.author.username) {
       const res = await ctx.app.db('followers')
-        .where({user: article.author.id, follower: user.id})
+        .where({ user: article.author.id, follower: user.id })
         .select()
 
       if (res.length > 0) {
@@ -66,7 +66,7 @@ module.exports = {
 
     if (user) {
       favorites = await ctx.app.db('favorites')
-        .where({user: user.id, article: article.id})
+        .where({ user: user.id, article: article.id })
         .select()
 
       if (favorites.length > 0) {
@@ -86,8 +86,8 @@ module.exports = {
   },
 
   async get (ctx) {
-    const {user} = ctx.state
-    const {offset, limit, tag, author, favorited} = ctx.query
+    const { user } = ctx.state
+    const { offset, limit, tag, author, favorited } = ctx.query
 
     let articlesQuery = ctx.app.db('articles')
       .select(
@@ -165,30 +165,30 @@ module.exports = {
     let articlesCount = countRes.count || countRes['count(*)']
     articlesCount = Number(articlesCount)
 
-    ctx.body = {articles, articlesCount}
+    ctx.body = { articles, articlesCount }
   },
 
   async getOne (ctx) {
-    ctx.body = {article: ctx.params.article}
+    ctx.body = { article: ctx.params.article }
   },
 
   async post (ctx) {
-    const {body} = ctx.request
-    let {article} = body
+    const { body } = ctx.request
+    let { article } = body
     let tags
-    const opts = {abortEarly: false}
+    const opts = { abortEarly: false }
 
     article.id = uuid()
     article.author = ctx.state.user.id
 
     article = await ctx.app.schemas.article.validate(article, opts)
 
-    article.slug = slug(_.get(article, 'title', ''), {lower: true})
+    article.slug = slug(_.get(article, 'title', ''), { lower: true })
 
     if (article.tagList && article.tagList.length > 0) {
       tags = await Promise.all(
         article.tagList
-          .map(t => ({id: uuid(), name: t}))
+          .map(t => ({ id: uuid(), name: t }))
           .map(t => ctx.app.schemas.tag.validate(t, opts))
       )
     }
@@ -235,19 +235,19 @@ module.exports = {
     article.author = _.pick(ctx.state.user, ['username', 'bio', 'image'])
     article.author.following = false
 
-    ctx.body = {article}
+    ctx.body = { article }
   },
 
   async put (ctx) {
-    const {article} = ctx.params
+    const { article } = ctx.params
 
     if (article.author.id !== ctx.state.user.id) {
       ctx.throw(403, new ValidationError(['not owned by user'], '', 'article'))
     }
 
-    const {body} = ctx.request
-    let {article: fields = {}} = body
-    const opts = {abortEarly: false}
+    const { body } = ctx.request
+    let { article: fields = {} } = body
+    const opts = { abortEarly: false }
 
     let newArticle = Object.assign({}, article, fields)
     newArticle.author = newArticle.author.id
@@ -257,7 +257,7 @@ module.exports = {
     )
 
     if (fields.title) {
-      newArticle.slug = slug(_.get(newArticle, 'title', ''), {lower: true})
+      newArticle.slug = slug(_.get(newArticle, 'title', ''), { lower: true })
     }
 
     newArticle.updatedAt = new Date().toISOString()
@@ -270,7 +270,7 @@ module.exports = {
             ['title', 'slug', 'body', 'description', 'updatedAt']
           )
         ))
-        .where({id: article.id})
+        .where({ id: article.id })
     } catch (err) {
       if (Number(err.errno) === 19 || Number(err.code) === 23505) {
         newArticle.slug = newArticle.slug + '-' + uuid().substr(-6)
@@ -282,7 +282,7 @@ module.exports = {
               ['title', 'slug', 'body', 'description', 'updatedAt']
             )
           ))
-          .where({id: article.id})
+          .where({ id: article.id })
       } else {
         throw err
       }
@@ -291,18 +291,18 @@ module.exports = {
     if (fields.tagList && fields.tagList.length === 0) {
       await ctx.app.db('articles_tags')
         .del()
-        .where({article: article.id})
+        .where({ article: article.id })
     }
 
     if (fields.tagList && fields.tagList.length > 0) {
       if (_.difference(article.tagList).length || _.difference(fields.tagList).length) {
         await ctx.app.db('articles_tags')
           .del()
-          .where({article: article.id})
+          .where({ article: article.id })
 
         let tags = await Promise.all(
           newArticle.tagList
-            .map(t => ({id: uuid(), name: t}))
+            .map(t => ({ id: uuid(), name: t }))
             .map(t => ctx.app.schemas.tag.validate(t, opts))
         )
 
@@ -332,11 +332,11 @@ module.exports = {
 
     newArticle.author = ctx.params.author
     newArticle.favorited = article.favorited
-    ctx.body = {article: newArticle}
+    ctx.body = { article: newArticle }
   },
 
   async del (ctx) {
-    const {article} = ctx.params
+    const { article } = ctx.params
 
     if (article.author.id !== ctx.state.user.id) {
       ctx.throw(403, new ValidationError(['not owned by user'], '', 'article'))
@@ -345,13 +345,13 @@ module.exports = {
     await Promise.all([
       ctx.app.db('favorites')
         .del()
-        .where({user: ctx.state.user.id, article: article.id}),
+        .where({ user: ctx.state.user.id, article: article.id }),
       ctx.app.db('articles_tags')
         .del()
-        .where({article: article.id}),
+        .where({ article: article.id }),
       ctx.app.db('articles')
         .del()
-        .where({id: article.id})
+        .where({ id: article.id })
     ])
 
     ctx.body = {}
@@ -360,12 +360,12 @@ module.exports = {
   feed: {
 
     async get (ctx) {
-      const {user} = ctx.state
-      const {offset, limit} = ctx.query
+      const { user } = ctx.state
+      const { offset, limit } = ctx.query
 
       const followedQuery = ctx.app.db('followers')
         .pluck('user')
-        .where({follower: user.id})
+        .where({ follower: user.id })
 
       let [articles, [countRes]] = await Promise.all([
         ctx.app.db('articles')
@@ -404,7 +404,7 @@ module.exports = {
       let articlesCount = countRes.count || countRes['count(*)']
       articlesCount = Number(articlesCount)
 
-      ctx.body = {articles, articlesCount}
+      ctx.body = { articles, articlesCount }
     }
 
   },
@@ -412,10 +412,10 @@ module.exports = {
   favorite: {
 
     async post (ctx) {
-      const {article} = ctx.params
+      const { article } = ctx.params
 
       if (article.favorited) {
-        ctx.body = {article: ctx.params.article}
+        ctx.body = { article: ctx.params.article }
         return
       }
 
@@ -427,36 +427,36 @@ module.exports = {
         }),
         ctx.app.db('articles')
           .increment('favorites_count', 1)
-          .where({id: article.id})
+          .where({ id: article.id })
       ])
 
       article.favorited = true
       article.favorites_count = Number(article.favorites_count) + 1
 
-      ctx.body = {article: ctx.params.article}
+      ctx.body = { article: ctx.params.article }
     },
 
     async del (ctx) {
-      const {article} = ctx.params
+      const { article } = ctx.params
 
       if (!article.favorited) {
-        ctx.body = {article: ctx.params.article}
+        ctx.body = { article: ctx.params.article }
         return
       }
 
       await Promise.all([
         ctx.app.db('favorites')
           .del()
-          .where({user: ctx.state.user.id, article: article.id}),
+          .where({ user: ctx.state.user.id, article: article.id }),
         ctx.app.db('articles')
           .decrement('favorites_count', 1)
-          .where({id: article.id})
+          .where({ id: article.id })
       ])
 
       article.favorited = false
       article.favorites_count = Number(article.favorites_count) - 1
 
-      ctx.body = {article: ctx.params.article}
+      ctx.body = { article: ctx.params.article }
     }
 
   },

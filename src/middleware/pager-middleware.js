@@ -9,7 +9,7 @@ module.exports = (ctx, next) => {
 
   ctx.query = qs.parse(ctx.querystring)
 
-  const {query} = ctx
+  const { query } = ctx
 
   query.limit = parseInt(query.limit, 10) || 20
   query.skip = query.offset = parseInt(query.offset, 10) || 0

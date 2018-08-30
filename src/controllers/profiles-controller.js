@@ -1,8 +1,8 @@
 const _ = require('lodash')
 const uuid = require('uuid')
 
-const {getSelect} = require('lib/utils')
-const {userFields, relationsMaps} = require('lib/relations-map')
+const { getSelect } = require('lib/utils')
+const { userFields, relationsMaps } = require('lib/relations-map')
 const joinJs = require('join-js').default
 
 module.exports = {
@@ -12,14 +12,14 @@ module.exports = {
       ctx.throw(404)
     }
 
-    const {user} = ctx.state
+    const { user } = ctx.state
 
     ctx.params.profile = await ctx.app.db('users')
       .select(
         ...getSelect('users', 'profile', userFields),
         'followers.id as profile_following'
       )
-      .where({username})
+      .where({ username })
       .leftJoin('followers', function () {
         this
           .on('users.id', '=', 'followers.user')
@@ -46,18 +46,18 @@ module.exports = {
   },
 
   async get (ctx) {
-    const {profile} = ctx.params
-    ctx.body = {profile}
+    const { profile } = ctx.params
+    ctx.body = { profile }
   },
 
   follow: {
 
     async post (ctx) {
-      const {profile} = ctx.params
-      const {user} = ctx.state
+      const { profile } = ctx.params
+      const { user } = ctx.state
 
       if (profile.following) {
-        ctx.body = {profile}
+        ctx.body = { profile }
         return
       }
 
@@ -79,25 +79,25 @@ module.exports = {
         profile.following = true
       }
 
-      ctx.body = {profile}
+      ctx.body = { profile }
     },
 
     async del (ctx) {
-      const {profile} = ctx.params
-      const {user} = ctx.state
+      const { profile } = ctx.params
+      const { user } = ctx.state
 
       if (!profile.following) {
-        ctx.body = {profile}
+        ctx.body = { profile }
         return
       }
 
       await ctx.app.db('followers')
-        .where({user: profile.id, follower: user.id})
+        .where({ user: profile.id, follower: user.id })
         .del()
 
       profile.following = false
 
-      ctx.body = {profile}
+      ctx.body = { profile }
     }
 
   }

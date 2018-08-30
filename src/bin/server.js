@@ -1,5 +1,5 @@
 require('dotenv').config()
-const {server: {port, host}} = require('../config')
+const { server: { port, host } } = require('../config')
 
 const app = require('../app')
 

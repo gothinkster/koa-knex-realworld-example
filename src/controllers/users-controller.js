@@ -2,21 +2,21 @@ const humps = require('humps')
 const uuid = require('uuid')
 const _ = require('lodash')
 const bcrypt = require('bcrypt')
-const {ValidationError} = require('lib/errors')
-const {generateJWTforUser} = require('lib/utils')
+const { ValidationError } = require('lib/errors')
+const { generateJWTforUser } = require('lib/utils')
 
 module.exports = {
 
   async get (ctx) {
     const user = generateJWTforUser(ctx.state.user)
 
-    ctx.body = {user}
+    ctx.body = { user }
   },
 
   async post (ctx) {
-    const {body} = ctx.request
-    let {user = {}} = body
-    const opts = {abortEarly: false, context: {validatePassword: true}}
+    const { body } = ctx.request
+    let { user = {} } = body
+    const opts = { abortEarly: false, context: { validatePassword: true } }
 
     user.id = uuid()
 
@@ -28,13 +28,13 @@ module.exports = {
 
     user = generateJWTforUser(user)
 
-    ctx.body = {user: _.omit(user, ['password'])}
+    ctx.body = { user: _.omit(user, ['password']) }
   },
 
   async put (ctx) {
-    const {body} = ctx.request
-    let {user: fields = {}} = body
-    const opts = {abortEarly: false, context: {validatePassword: false}}
+    const { body } = ctx.request
+    let { user: fields = {} } = body
+    const opts = { abortEarly: false, context: { validatePassword: false } }
 
     if (fields.password) {
       opts.context.validatePassword = true
@@ -50,16 +50,16 @@ module.exports = {
     user.updatedAt = new Date().toISOString()
 
     await ctx.app.db('users')
-      .where({id: user.id})
+      .where({ id: user.id })
       .update(humps.decamelizeKeys(user))
 
     user = generateJWTforUser(user)
 
-    ctx.body = {user: _.omit(user, ['password'])}
+    ctx.body = { user: _.omit(user, ['password']) }
   },
 
   async login (ctx) {
-    const {body} = ctx.request
+    const { body } = ctx.request
 
     if (!_.isObject(body.user) || !body.user.email || !body.user.password) {
       ctx.throw(
@@ -70,7 +70,7 @@ module.exports = {
 
     let user = await ctx.app.db('users')
       .first()
-      .where({email: body.user.email})
+      .where({ email: body.user.email })
 
     if (!user) {
       ctx.throw(
@@ -90,7 +90,7 @@ module.exports = {
 
     user = generateJWTforUser(user)
 
-    ctx.body = {user: _.omit(user, ['password'])}
+    ctx.body = { user: _.omit(user, ['password']) }
   }
 
 }

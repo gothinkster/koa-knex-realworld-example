@@ -1,8 +1,8 @@
 const path = require('path')
 const ROOT = path.resolve(__dirname, '../../')
-require('dotenv').config({path: path.join(ROOT, '.env')})
+require('dotenv').config({ path: path.join(ROOT, '.env') })
 
-const {DB_CLIENT, DB_CONNECTION} = process.env
+const { DB_CLIENT, DB_CONNECTION } = process.env
 
 const options = {
   client: DB_CLIENT || 'sqlite3',

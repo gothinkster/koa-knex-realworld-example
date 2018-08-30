@@ -1,8 +1,8 @@
 const humps = require('humps')
 const uuid = require('uuid')
 const _ = require('lodash')
-const {getSelect} = require('lib/utils')
-const {commentFields, userFields, relationsMaps} = require('lib/relations-map')
+const { getSelect } = require('lib/utils')
+const { commentFields, userFields, relationsMaps } = require('lib/relations-map')
 const joinJs = require('join-js').default
 
 module.exports = {
@@ -12,7 +12,7 @@ module.exports = {
       ctx.throw(404)
     }
 
-    comment = await ctx.app.db('comments').first().where({id: comment})
+    comment = await ctx.app.db('comments').first().where({ id: comment })
 
     if (!comment) {
       ctx.throw(404)
@@ -24,8 +24,8 @@ module.exports = {
   },
 
   async get (ctx) {
-    const {user} = ctx.state
-    const {article} = ctx.params
+    const { user } = ctx.state
+    const { article } = ctx.params
 
     let comments = await ctx.app.db('comments')
       .select(
@@ -33,7 +33,7 @@ module.exports = {
         ...getSelect('users', 'author', userFields),
         'followers.id as author_following'
       )
-      .where({article: article.id})
+      .where({ article: article.id })
       .leftJoin('users', 'comments.author', 'users.id')
       .leftJoin('followers', function () {
         this
@@ -49,16 +49,16 @@ module.exports = {
         return c
       })
 
-    ctx.body = {comments}
+    ctx.body = { comments }
   },
 
   async post (ctx) {
-    const {body} = ctx.request
-    const {user} = ctx.state
-    const {article} = ctx.params
-    let {comment = {}} = body
+    const { body } = ctx.request
+    const { user } = ctx.state
+    const { article } = ctx.params
+    let { comment = {} } = body
 
-    const opts = {abortEarly: false}
+    const opts = { abortEarly: false }
 
     comment.id = uuid()
     comment.author = user.id
@@ -70,13 +70,13 @@ module.exports = {
 
     comment.author = _.pick(user, ['username', 'bio', 'image', 'id'])
 
-    ctx.body = {comment}
+    ctx.body = { comment }
   },
 
   async del (ctx) {
-    const {comment} = ctx.params
+    const { comment } = ctx.params
 
-    await ctx.app.db('comments').del().where({id: comment.id})
+    await ctx.app.db('comments').del().where({ id: comment.id })
 
     ctx.body = {}
   }

@@ -1,4 +1,4 @@
-const {jwtSecret, jwtOptions} = require('config')
+const { jwtSecret, jwtOptions } = require('config')
 const jwt = require('jsonwebtoken')
 const _ = require('lodash')
 

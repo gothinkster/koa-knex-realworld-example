@@ -20,7 +20,7 @@ module.exports = async (ctx, next) => {
     ctx.type = 'application/json'
 
     if (!ctx.response.body) {
-      ctx.response.body = {errors: {}}
+      ctx.response.body = { errors: {} }
     }
     // ctx.app.emit('error', err, ctx);
     console.error(err)
