@@ -18,6 +18,13 @@
     "semi": false,
     "trailingComma": "all"
   },
+  "jest": {
+    "bail": true,
+    "testEnvironment": "node",
+    "coverageReporters": [
+      "text"
+    ]
+  },
   "pre-commit": [
     "lint"
   ],
@@ -76,18 +83,5 @@
     "jest": "^23.5.0",
     "pre-commit": "^1.2.2",
     "prettier": "^1.15.3"
-  },
-  "jest": {
-    "testPathIgnorePatterns": [
-      "<rootDir>[/\\\\](docs|node_modules)[/\\\\]"
-    ],
-    "bail": true,
-    "testMatch": [
-      "**/__tests__/**/*index.js?(x)",
-      "**/?(*.)(spec|test)index.js?(x)"
-    ],
-    "modulePaths": [
-      "src"
-    ]
   }
 }
