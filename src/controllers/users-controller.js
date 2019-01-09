@@ -1,19 +1,18 @@
-const humps = require('humps')
-const uuid = require('uuid')
-const _ = require('lodash')
-const bcrypt = require('bcrypt')
-const { ValidationError } = require('lib/errors')
-const { generateJWTforUser } = require('lib/utils')
+const humps = require("humps")
+const uuid = require("uuid")
+const _ = require("lodash")
+const bcrypt = require("bcrypt")
+const { ValidationError } = require("lib/errors")
+const { generateJWTforUser } = require("lib/utils")
 
 module.exports = {
-
-  async get (ctx) {
+  async get(ctx) {
     const user = generateJWTforUser(ctx.state.user)
 
     ctx.body = { user }
   },
 
-  async post (ctx) {
+  async post(ctx) {
     const { body } = ctx.request
     let { user = {} } = body
     const opts = { abortEarly: false, context: { validatePassword: true } }
@@ -24,14 +23,14 @@ module.exports = {
 
     user.password = await bcrypt.hash(user.password, 10)
 
-    await ctx.app.db('users').insert(humps.decamelizeKeys(user))
+    await ctx.app.db("users").insert(humps.decamelizeKeys(user))
 
     user = generateJWTforUser(user)
 
-    ctx.body = { user: _.omit(user, ['password']) }
+    ctx.body = { user: _.omit(user, ["password"]) }
   },
 
-  async put (ctx) {
+  async put(ctx) {
     const { body } = ctx.request
     let { user: fields = {} } = body
     const opts = { abortEarly: false, context: { validatePassword: false } }
@@ -49,33 +48,35 @@ module.exports = {
 
     user.updatedAt = new Date().toISOString()
 
-    await ctx.app.db('users')
+    await ctx.app
+      .db("users")
       .where({ id: user.id })
       .update(humps.decamelizeKeys(user))
 
     user = generateJWTforUser(user)
 
-    ctx.body = { user: _.omit(user, ['password']) }
+    ctx.body = { user: _.omit(user, ["password"]) }
   },
 
-  async login (ctx) {
+  async login(ctx) {
     const { body } = ctx.request
 
     if (!_.isObject(body.user) || !body.user.email || !body.user.password) {
       ctx.throw(
         422,
-        new ValidationError(['is invalid'], '', 'email or password')
+        new ValidationError(["is invalid"], "", "email or password"),
       )
     }
 
-    let user = await ctx.app.db('users')
+    let user = await ctx.app
+      .db("users")
       .first()
       .where({ email: body.user.email })
 
     if (!user) {
       ctx.throw(
         422,
-        new ValidationError(['is invalid'], '', 'email or password')
+        new ValidationError(["is invalid"], "", "email or password"),
       )
     }
 
@@ -84,13 +85,12 @@ module.exports = {
     if (!isValid) {
       ctx.throw(
         422,
-        new ValidationError(['is invalid'], '', 'email or password')
+        new ValidationError(["is invalid"], "", "email or password"),
       )
     }
 
     user = generateJWTforUser(user)
 
-    ctx.body = { user: _.omit(user, ['password']) }
-  }
-
+    ctx.body = { user: _.omit(user, ["password"]) }
+  },
 }

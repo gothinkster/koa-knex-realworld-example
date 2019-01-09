@@ -10,8 +10,13 @@
     "start": "cross-env NODE_PATH=src node src/bin/server.js",
     "db:load": "knex seed:run --knexfile src/config/knexfile.js",
     "lint": "eslint \"**/*.js\"",
+    "format": "prettier --write \"**/*.js\"",
     "test": "jest",
     "test:watch": "jest --watch"
+  },
+  "prettier": {
+    "semi": false,
+    "trailingComma": "all"
   },
   "pre-commit": [
     "lint"
@@ -69,7 +74,8 @@
     "eslint-plugin-standard": "^4.0.0",
     "faker": "^4.1.0",
     "jest": "^23.5.0",
-    "pre-commit": "^1.2.2"
+    "pre-commit": "^1.2.2",
+    "prettier": "^1.15.3"
   },
   "jest": {
     "testPathIgnorePatterns": [
