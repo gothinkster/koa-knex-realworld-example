@@ -1,39 +1,38 @@
-require("dotenv").config()
+require("../lib/bootstrap")
+const pEvent = require("p-event")
+const createServerAndListen = require("../lib/server")
 const {
   server: { port, host },
 } = require("../config")
 
 const app = require("../app")
 
-process.once("SIGINT", () => app.shutDown())
-process.once("SIGTERM", () => app.shutDown())
+async function main() {
+  let server
 
-app.server.listen(port, host)
+  try {
+    server = await createServerAndListen(app, port, host)
+    console.log(`Server is listening on: ${host}:${port}`)
 
-app.server.on("error", onError)
-app.server.on("listening", onListening)
+    await Promise.race([
+      ...["SIGINT", "SIGHUP", "SIGTERM"].map(s =>
+        pEvent(process, s, {
+          rejectionEvents: ["uncaughtException", "unhandledRejection"],
+        }),
+      ),
+    ])
+  } catch (err) {
+    process.exitCode = 1
+    console.error(err)
+  } finally {
+    if (server) {
+      console.log("Close server")
+      await server.stop()
+      console.log("Server closed")
+    }
 
-function onError(error) {
-  if (error.syscall !== "listen") {
-    throw error
-  }
-
-  var bind = typeof port === "string" ? "Pipe " + port : "Port " + port
-
-  switch (error.code) {
-    case "EACCES":
-      console.error(bind + " requires elevated privileges")
-      process.exit(1)
-    case "EADDRINUSE":
-      console.error(bind + " is already in use")
-      process.exit(1)
-    default:
-      throw error
+    setTimeout(() => process.exit(), 10000).unref()
   }
 }
 
-function onListening() {
-  var addr = app.server.address()
-  var bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port
-  console.log("Listening on " + bind)
-}
+main()

@@ -1,5 +1,4 @@
 const config = require("config")
-const http = require("http")
 const Koa = require("koa")
 
 const app = new Koa()
@@ -39,30 +38,5 @@ app.use(pagerMiddleware)
 
 app.use(routes.routes())
 app.use(routes.allowedMethods())
-
-app.server = require("http-shutdown")(http.createServer(app.callback()))
-
-app.shutDown = function shutDown() {
-  let err
-
-  console.log("Shutdown")
-
-  if (this.server.listening) {
-    this.server.shutdown(error => {
-      if (error) {
-        console.error(error)
-        err = error
-      }
-
-      this.db
-        .destroy()
-        .catch(error => {
-          console.error(error)
-          err = error
-        })
-        .then(() => process.exit(err ? 1 : 0))
-    })
-  }
-}
 
 module.exports = app
