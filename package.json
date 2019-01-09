@@ -1,17 +1,17 @@
 {
-  "name": "node-koa-realworld-starter-kit",
+  "name": "koa-knex-realworld-example",
   "version": "1.0.0",
-  "description": "conduit on koa.js",
-  "main": "index.js",
-  "repository": "git@github.com:dimonnwc3/node-koa-realworld-starter-kit.git",
+  "description": "conduit on koa with knex",
+  "main": "src/bin/server",
+  "repository": "git@github.com:gothinkster/koa-knex-realworld-example.git",
   "author": "Dmitrii Solovev <dimonnwc3@gmail.com>",
   "license": "ISC",
   "scripts": {
-    "start": "cross-env NODE_PATH=src node src/bin/server.js",
+    "start": "cross-env NODE_PATH=src node src/bin/server",
     "db:load": "knex seed:run --knexfile src/config/knexfile.js",
     "lint": "eslint \"**/*.js\"",
     "format": "prettier --write \"**/*.js\"",
-    "test": "jest",
+    "test": "jest --coverage --verbose",
     "test:watch": "jest --watch"
   },
   "prettier": {
