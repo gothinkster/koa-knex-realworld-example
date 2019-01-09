@@ -21,10 +21,8 @@ const pagerMiddleware = require("middleware/pager-middleware")
 const userMiddleware = require("middleware/user-middleware")
 const routes = require("routes")
 
-if (!config.env.isTest) {
-  app.use(responseTime())
-  app.use(helmet())
-}
+app.use(responseTime())
+app.use(helmet())
 
 app.use(logger())
 
