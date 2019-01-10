@@ -9,6 +9,9 @@
   "scripts": {
     "start": "cross-env NODE_PATH=src node src/bin/server",
     "db:load": "knex seed:run",
+    "db:migrate": "knex migrate:latest",
+    "db:rollback": "knex migrate:rollback",
+    "db:currentVersion": "knex migrate:currentVersion",
     "lint": "eslint \"**/*.js\"",
     "format": "prettier --write \"**/*.js\"",
     "test": "jest --coverage --verbose",
