@@ -1,12 +1,5 @@
 const errors = require("lib/errors")
-let constants = require("lib/constants")
 const _ = require("lodash")
-
-const http = require("http")
-
-Object.entries(http.STATUS_CODES).forEach(([key, value]) => {
-  constants.HTTP[key] = value.toUpperCase().replace(/\s/gim, "_")
-})
 
 module.exports = async (ctx, next) => {
   try {
@@ -61,10 +54,6 @@ module.exports = async (ctx, next) => {
       default:
         ctx.status = _.defaultTo(err.status, 500)
         break
-    }
-  } finally {
-    if (ctx.body && !ctx.body.code) {
-      ctx.body.code = constants.HTTP[String(ctx.status)]
     }
   }
 }
