@@ -3,14 +3,14 @@ const uuid = require("uuid")
 const humps = require("humps")
 const _ = require("lodash")
 const comments = require("./comments-controller")
-const { ValidationError } = require("lib/errors")
+const { ValidationError } = require("../lib/errors")
 
-const { getSelect } = require("lib/utils")
+const { getSelect } = require("../lib/utils")
 const {
   articleFields,
   userFields,
   relationsMaps,
-} = require("lib/relations-map")
+} = require("../lib/relations-map")
 const joinJs = require("join-js").default
 
 module.exports = {

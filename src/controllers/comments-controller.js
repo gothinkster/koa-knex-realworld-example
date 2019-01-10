@@ -1,12 +1,12 @@
 const humps = require("humps")
 const uuid = require("uuid")
 const _ = require("lodash")
-const { getSelect } = require("lib/utils")
+const { getSelect } = require("../lib/utils")
 const {
   commentFields,
   userFields,
   relationsMaps,
-} = require("lib/relations-map")
+} = require("../lib/relations-map")
 const joinJs = require("join-js").default
 
 module.exports = {

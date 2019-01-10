@@ -1,8 +1,8 @@
 const _ = require("lodash")
 const uuid = require("uuid")
 
-const { getSelect } = require("lib/utils")
-const { userFields, relationsMaps } = require("lib/relations-map")
+const { getSelect } = require("../lib/utils")
+const { userFields, relationsMaps } = require("../lib/relations-map")
 const joinJs = require("join-js").default
 
 module.exports = {

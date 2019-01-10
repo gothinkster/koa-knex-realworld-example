@@ -1,4 +1,4 @@
-const { UnauthorizedError } = require("lib/errors")
+const { UnauthorizedError } = require("../lib/errors")
 
 module.exports = function(ctx, next) {
   if (!ctx.state.user) {

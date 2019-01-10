@@ -6,19 +6,19 @@ const app = new Koa()
 
 app.keys = [config.get("secret")]
 
-require("schemas")(app)
+require("../schemas")(app)
 
 const responseTime = require("koa-response-time")
 const helmet = require("koa-helmet")
 const logger = require("koa-logger")
-const camelizeMiddleware = require("middleware/camelize-middleware")
-const error = require("middleware/error-middleware")
+const camelizeMiddleware = require("../middleware/camelize-middleware")
+const error = require("../middleware/error-middleware")
 const cors = require("kcors")
-const jwt = require("middleware/jwt-middleware")
+const jwt = require("../middleware/jwt-middleware")
 const bodyParser = require("koa-bodyparser")
-const pagerMiddleware = require("middleware/pager-middleware")
-const userMiddleware = require("middleware/user-middleware")
-const routes = require("routes")
+const pagerMiddleware = require("../middleware/pager-middleware")
+const userMiddleware = require("../middleware/user-middleware")
+const routes = require("../routes")
 
 app.db = db
 app.use(responseTime())

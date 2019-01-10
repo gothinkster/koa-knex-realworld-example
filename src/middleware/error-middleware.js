@@ -1,4 +1,4 @@
-const errors = require("lib/errors")
+const errors = require("../lib/errors")
 const _ = require("lodash")
 
 module.exports = async (ctx, next) => {

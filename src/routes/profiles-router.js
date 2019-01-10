@@ -1,8 +1,8 @@
 const Router = require("koa-router")
-const ctrl = require("controllers").profiles
+const ctrl = require("../controllers").profiles
 const router = new Router()
 
-const auth = require("middleware/auth-required-middleware")
+const auth = require("../middleware/auth-required-middleware")
 
 router.param("username", ctrl.byUsername)
 

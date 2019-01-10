@@ -2,8 +2,8 @@ const humps = require("humps")
 const uuid = require("uuid")
 const _ = require("lodash")
 const bcrypt = require("bcrypt")
-const { ValidationError } = require("lib/errors")
-const { generateJWTforUser } = require("lib/utils")
+const { ValidationError } = require("../lib/errors")
+const { generateJWTforUser } = require("../lib/utils")
 
 module.exports = {
   async get(ctx) {
