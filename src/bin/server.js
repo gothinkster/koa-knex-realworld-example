@@ -1,13 +1,13 @@
 require("../lib/bootstrap")
 const pEvent = require("p-event")
 const createServerAndListen = require("../lib/server")
-const {
-  server: { port, host },
-} = require("../config")
+const config = require("config")
 
 const app = require("../app")
 
 async function main() {
+  const host = config.get("server.host")
+  const port = config.get("server.port")
   let server
 
   try {

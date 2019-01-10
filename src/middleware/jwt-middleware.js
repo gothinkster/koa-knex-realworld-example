@@ -1,5 +1,5 @@
 const koaJwt = require("koa-jwt")
-const { jwtSecret } = require("config")
+const config = require("config")
 
 module.exports = koaJwt({
   getToken(ctx, opts) {
@@ -15,7 +15,7 @@ module.exports = koaJwt({
 
     return null
   },
-  secret: jwtSecret,
+  secret: config.get("secret"),
   passthrough: true,
   key: "jwt",
 })

@@ -1,4 +1,4 @@
-const { jwtSecret, jwtOptions } = require("config")
+const config = require("config")
 const jwt = require("jsonwebtoken")
 const _ = require("lodash")
 
@@ -8,8 +8,10 @@ function generateJWTforUser(user = {}) {
       {
         sub: _.pick(user, ["id", "email", "username"]),
       },
-      jwtSecret,
-      jwtOptions,
+      config.get("secret"),
+      {
+        expiresIn: "7d",
+      },
     ),
   })
 }

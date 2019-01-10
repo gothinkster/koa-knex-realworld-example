@@ -3,7 +3,6 @@ const _ = require("lodash")
 const uuid = require("uuid")
 const slug = require("slug")
 const { subMonths } = require("date-fns")
-const config = require("../config")
 const { getUsers } = require("./01-users")
 
 function getArticles(users) {
@@ -33,7 +32,7 @@ exports.getArticles = getArticles
 exports.seed = async function(knex) {
   const users = getUsers()
 
-  if (config.env.isProd) {
+  if (process.env.NODE_ENV === "production") {
     await knex("articles")
       .whereIn("author", users.map(u => u.id))
       .del()

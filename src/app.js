@@ -3,7 +3,7 @@ const Koa = require("koa")
 
 const app = new Koa()
 
-app.keys = [config.secret]
+app.keys = [config.get("secret")]
 
 require("schemas")(app)
 
@@ -29,9 +29,22 @@ app.use(camelizeMiddleware)
 
 app.use(error)
 app.use(db(app))
-app.use(cors(config.cors))
+app.use(
+  cors({
+    origin: "*",
+    exposeHeaders: ["Authorization"],
+    credentials: true,
+    allowMethods: ["GET", "PUT", "POST", "DELETE"],
+    allowHeaders: ["Authorization", "Content-Type"],
+    keepHeadersOnError: true,
+  }),
+)
 app.use(jwt)
-app.use(bodyParser(config.bodyParser))
+app.use(
+  bodyParser({
+    enableTypes: ["json"],
+  }),
+)
 
 app.use(userMiddleware)
 app.use(pagerMiddleware)

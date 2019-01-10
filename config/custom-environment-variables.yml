@@ -1,0 +1,16 @@
+server:
+  host: HOST
+  port: PORT
+  domain: DOMAIN
+
+env:
+  enviroinment: ENVIROINMENT
+  logLevel: LOG_LEVEL
+  name: npm_package_name
+  version: npm_package_version
+
+secret: SECRET
+
+db:
+  client: DB_CLIENT
+  connection: DB_CONNECTION

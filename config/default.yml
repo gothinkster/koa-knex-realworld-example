@@ -1,0 +1,15 @@
+server:
+  host: 0.0.0.0
+  port: 3000
+  domain: example.com
+
+env:
+  enviroinment: local
+  logLevel: info
+  name: app
+  version: 0.0.0
+
+secret: secret
+
+db:
+  client: sqlite3
