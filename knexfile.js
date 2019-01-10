@@ -1,5 +1,16 @@
 require("./src/lib/bootstrap")
 const config = require("config")
+const fs = require("fs")
+
+if (config.get("db.client") === "sqlite3") {
+  try {
+    fs.mkdirSync("data")
+  } catch (err) {
+    if (err.code !== "EEXIST") {
+      throw err
+    }
+  }
+}
 
 const dbClient = config.get("db.client")
 const dbConnection = config.has("db.connection") && config.get("db.connection")
