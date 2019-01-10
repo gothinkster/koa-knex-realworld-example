@@ -3,7 +3,7 @@ const pEvent = require("p-event")
 const createServerAndListen = require("../lib/server")
 const config = require("config")
 
-const app = require("../app")
+const app = require("../lib/app")
 
 async function main() {
   const host = config.get("server.host")
