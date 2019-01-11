@@ -3,6 +3,8 @@ const Koa = require("koa")
 
 const app = new Koa()
 
+app.proxy = true
+
 app.keys = [config.get("secret")]
 
 require("../schemas")(app)
@@ -10,6 +12,7 @@ require("../schemas")(app)
 const responseTime = require("koa-response-time")
 const helmet = require("koa-helmet")
 const logger = require("koa-logger")
+const xRequestId = require("koa-x-request-id")
 const camelizeMiddleware = require("../middleware/camelize-middleware")
 const error = require("../middleware/error-middleware")
 const cors = require("kcors")
@@ -20,13 +23,9 @@ const userMiddleware = require("../middleware/user-middleware")
 const routes = require("../routes")
 
 app.use(responseTime())
-app.use(helmet())
-
+app.use(xRequestId({ inject: true }, app))
 app.use(logger())
-
-app.use(camelizeMiddleware)
-
-app.use(error)
+app.use(helmet())
 app.use(
   cors({
     origin: "*",
@@ -37,6 +36,10 @@ app.use(
     keepHeadersOnError: true,
   }),
 )
+
+app.use(camelizeMiddleware)
+
+app.use(error)
 app.use(jwt)
 app.use(
   bodyParser({
