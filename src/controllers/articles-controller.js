@@ -15,17 +15,13 @@ const {
 
 module.exports = {
   async bySlug(slug, ctx, next) {
-    if (!slug) {
-      ctx.throw(404)
-    }
+    ctx.assert(slug, 404)
 
     const article = await db("articles")
       .first()
       .where({ slug })
 
-    if (!article) {
-      ctx.throw(404)
-    }
+    ctx.assert(article, 404)
 
     const tagsRelations = await db("articles_tags")
       .select()

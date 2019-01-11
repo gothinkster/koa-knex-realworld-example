@@ -4,11 +4,17 @@ const _ = require("lodash")
 module.exports = async (ctx, next) => {
   try {
     await next()
-    if (Number(ctx.response.status) === 404 && !ctx.response.body) {
-      ctx.throw(404)
-    }
+    ctx.assert(ctx.response.body && Number(ctx.response.status) !== 404, 404)
   } catch (err) {
     ctx.type = "application/json"
+
+    const status =
+      err.status ||
+      err.statusCode ||
+      err.status_code ||
+      (err.output && err.output.statusCode) ||
+      (err.oauthError && err.oauthError.statusCode) ||
+      500
 
     if (!ctx.response.body) {
       ctx.response.body = { errors: {} }
@@ -19,7 +25,7 @@ module.exports = async (ctx, next) => {
     switch (true) {
       case err instanceof errors.ValidationError:
         ctx.body.errors = formatValidationError(err)
-        ctx.status = _.defaultTo(err.status, 422)
+        ctx.status = _.defaultTo(status, 422)
         break
 
       case err.code === "SQLITE_CONSTRAINT": {
@@ -34,7 +40,7 @@ module.exports = async (ctx, next) => {
           }
         }
 
-        ctx.status = _.defaultTo(err.status, 422)
+        ctx.status = _.defaultTo(status, 422)
         break
       }
 
@@ -47,12 +53,12 @@ module.exports = async (ctx, next) => {
         }
 
         ctx.body.errors[path] = ["has already been taken"]
-        ctx.status = _.defaultTo(err.status, 422)
+        ctx.status = _.defaultTo(status, 422)
         break
       }
 
       default:
-        ctx.status = _.defaultTo(err.status, 500)
+        ctx.status = _.defaultTo(status, 500)
         break
     }
   }

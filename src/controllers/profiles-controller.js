@@ -7,9 +7,7 @@ const db = require("../lib/db")
 
 module.exports = {
   async byUsername(username, ctx, next) {
-    if (!username) {
-      ctx.throw(404)
-    }
+    ctx.assert(username, 404)
 
     const { user } = ctx.state
 
@@ -25,9 +23,7 @@ module.exports = {
         ])
       })
 
-    if (!ctx.params.profile || !ctx.params.profile.length) {
-      ctx.throw(404)
-    }
+    ctx.assert(ctx.params.profile && ctx.params.profile.length, 404)
 
     ctx.params.profile = joinJs.mapOne(
       ctx.params.profile,

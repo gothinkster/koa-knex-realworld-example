@@ -1,8 +1,6 @@
-const { UnauthorizedError } = require("../lib/errors")
+const { AuthenticationError } = require("../lib/errors")
 
 module.exports = function(ctx, next) {
-  if (!ctx.state.user) {
-    ctx.throw(401, new UnauthorizedError())
-  }
+  ctx.assert(ctx.state.user, new AuthenticationError())
   return next()
 }

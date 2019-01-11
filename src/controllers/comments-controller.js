@@ -12,17 +12,13 @@ const {
 
 module.exports = {
   async byComment(comment, ctx, next) {
-    if (!comment) {
-      ctx.throw(404)
-    }
+    ctx.assert(comment, 404)
 
     comment = await db("comments")
       .first()
       .where({ id: comment })
 
-    if (!comment) {
-      ctx.throw(404)
-    }
+    ctx.assert(comment, 404)
 
     ctx.params.comment = comment
 
