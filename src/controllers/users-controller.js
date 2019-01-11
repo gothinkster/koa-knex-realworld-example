@@ -61,32 +61,29 @@ module.exports = {
   async login(ctx) {
     const { body } = ctx.request
 
-    if (!_.isObject(body.user) || !body.user.email || !body.user.password) {
-      ctx.throw(
-        422,
-        new ValidationError(["is invalid"], "", "email or password"),
-      )
-    }
+    ctx.assert(
+      _.isObject(body.user) && body.user.email && body.user.password,
+      422,
+      new ValidationError(["is invalid"], "", "email or password"),
+    )
 
     let user = await db("users")
       .first()
       .where({ email: body.user.email })
 
-    if (!user) {
-      ctx.throw(
-        422,
-        new ValidationError(["is invalid"], "", "email or password"),
-      )
-    }
+    ctx.assert(
+      user,
+      422,
+      new ValidationError(["is invalid"], "", "email or password"),
+    )
 
     const isValid = await bcrypt.compare(body.user.password, user.password)
 
-    if (!isValid) {
-      ctx.throw(
-        422,
-        new ValidationError(["is invalid"], "", "email or password"),
-      )
-    }
+    ctx.assert(
+      isValid,
+      422,
+      new ValidationError(["is invalid"], "", "email or password"),
+    )
 
     user = generateJWTforUser(user)
 

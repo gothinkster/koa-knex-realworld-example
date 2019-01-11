@@ -65,9 +65,10 @@ module.exports = {
         try {
           await db("followers").insert(follow)
         } catch (err) {
-          if (Number(err.errno) !== 19 && Number(err.code) !== 23505) {
-            throw err
-          }
+          ctx.assert(
+            parseInt(err.errno, 10) === 19 && parseInt(err.code, 10) === 23505,
+            err,
+          )
         }
 
         profile.following = true

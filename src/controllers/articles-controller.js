@@ -205,15 +205,16 @@ module.exports = {
         humps.decamelizeKeys(_.omit(article, ["tagList"])),
       )
     } catch (err) {
-      if (Number(err.errno) === 19 || Number(err.code) === 23505) {
-        article.slug = article.slug + "-" + uuid().substr(-6)
+      ctx.assert(
+        parseInt(err.errno, 10) === 19 || parseInt(err.code, 10) === 23505,
+        err,
+      )
 
-        await db("articles").insert(
-          humps.decamelizeKeys(_.omit(article, ["tagList"])),
-        )
-      } else {
-        throw err
-      }
+      article.slug = article.slug + "-" + uuid().substr(-6)
+
+      await db("articles").insert(
+        humps.decamelizeKeys(_.omit(article, ["tagList"])),
+      )
     }
 
     if (tags && tags.length) {
@@ -221,9 +222,10 @@ module.exports = {
         try {
           await db("tags").insert(humps.decamelizeKeys(tags[i]))
         } catch (err) {
-          if (Number(err.errno) !== 19 && Number(err.code) !== 23505) {
-            throw err
-          }
+          ctx.assert(
+            parseInt(err.errno, 10) === 19 || parseInt(err.code, 10) === 23505,
+            err,
+          )
         }
       }
 
@@ -250,9 +252,11 @@ module.exports = {
   async put(ctx) {
     const { article } = ctx.params
 
-    if (article.author.id !== ctx.state.user.id) {
-      ctx.throw(403, new ValidationError(["not owned by user"], "", "article"))
-    }
+    ctx.assert(
+      article.author.id === ctx.state.user.id,
+      422,
+      new ValidationError(["not owned by user"], "", "article"),
+    )
 
     const { body } = ctx.request
     let { article: fields = {} } = body
@@ -286,25 +290,26 @@ module.exports = {
         )
         .where({ id: article.id })
     } catch (err) {
-      if (Number(err.errno) === 19 || Number(err.code) === 23505) {
-        newArticle.slug = newArticle.slug + "-" + uuid().substr(-6)
+      ctx.assert(
+        parseInt(err.errno, 10) === 19 || parseInt(err.code, 10) === 23505,
+        err,
+      )
 
-        await db("articles")
-          .update(
-            humps.decamelizeKeys(
-              _.pick(newArticle, [
-                "title",
-                "slug",
-                "body",
-                "description",
-                "updatedAt",
-              ]),
-            ),
-          )
-          .where({ id: article.id })
-      } else {
-        throw err
-      }
+      newArticle.slug = newArticle.slug + "-" + uuid().substr(-6)
+
+      await db("articles")
+        .update(
+          humps.decamelizeKeys(
+            _.pick(newArticle, [
+              "title",
+              "slug",
+              "body",
+              "description",
+              "updatedAt",
+            ]),
+          ),
+        )
+        .where({ id: article.id })
     }
 
     if (fields.tagList && fields.tagList.length === 0) {
@@ -332,9 +337,11 @@ module.exports = {
           try {
             await db("tags").insert(humps.decamelizeKeys(tags[i]))
           } catch (err) {
-            if (Number(err.errno) !== 19 && Number(err.code) !== 23505) {
-              throw err
-            }
+            ctx.assert(
+              parseInt(err.errno, 10) === 19 ||
+                parseInt(err.code, 10) === 23505,
+              err,
+            )
           }
         }
 
@@ -360,9 +367,11 @@ module.exports = {
   async del(ctx) {
     const { article } = ctx.params
 
-    if (article.author.id !== ctx.state.user.id) {
-      ctx.throw(403, new ValidationError(["not owned by user"], "", "article"))
-    }
+    ctx.assert(
+      article.author.id === ctx.state.user.id,
+      422,
+      new ValidationError(["not owned by user"], "", "article"),
+    )
 
     await Promise.all([
       db("favorites")
