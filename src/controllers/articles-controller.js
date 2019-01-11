@@ -4,14 +4,14 @@ const humps = require("humps")
 const _ = require("lodash")
 const comments = require("./comments-controller")
 const { ValidationError } = require("../lib/errors")
-
+const db = require("../lib/db")
+const joinJs = require("join-js").default
 const { getSelect } = require("../lib/utils")
 const {
   articleFields,
   userFields,
   relationsMaps,
 } = require("../lib/relations-map")
-const joinJs = require("join-js").default
 
 module.exports = {
   async bySlug(slug, ctx, next) {
@@ -19,8 +19,7 @@ module.exports = {
       ctx.throw(404)
     }
 
-    const article = await ctx.app
-      .db("articles")
+    const article = await db("articles")
       .first()
       .where({ slug })
 
@@ -28,16 +27,14 @@ module.exports = {
       ctx.throw(404)
     }
 
-    const tagsRelations = await ctx.app
-      .db("articles_tags")
+    const tagsRelations = await db("articles_tags")
       .select()
       .where({ article: article.id })
 
     let tagList = []
 
     if (tagsRelations && tagsRelations.length > 0) {
-      tagList = await ctx.app
-        .db("tags")
+      tagList = await db("tags")
         .select()
         .whereIn("id", tagsRelations.map(r => r.tag))
 
@@ -48,8 +45,7 @@ module.exports = {
 
     article.favorited = false
 
-    const author = await ctx.app
-      .db("users")
+    const author = await db("users")
       .first("username", "bio", "image", "id")
       .where({ id: article.author })
 
@@ -60,8 +56,7 @@ module.exports = {
     const { user } = ctx.state
 
     if (user && user.username !== article.author.username) {
-      const res = await ctx.app
-        .db("followers")
+      const res = await db("followers")
         .where({ user: article.author.id, follower: user.id })
         .select()
 
@@ -73,8 +68,7 @@ module.exports = {
     let favorites = []
 
     if (user) {
-      favorites = await ctx.app
-        .db("favorites")
+      favorites = await db("favorites")
         .where({ user: user.id, article: article.id })
         .select()
 
@@ -98,8 +92,7 @@ module.exports = {
     const { user } = ctx.state
     const { offset, limit, tag, author, favorited } = ctx.query
 
-    let articlesQuery = ctx.app
-      .db("articles")
+    let articlesQuery = db("articles")
       .select(
         ...getSelect("articles", "article", articleFields),
         ...getSelect("users", "author", userFields),
@@ -112,11 +105,10 @@ module.exports = {
       .offset(offset)
       .orderBy("articles.created_at", "desc")
 
-    let countQuery = ctx.app.db("articles").count()
+    let countQuery = db("articles").count()
 
     if (author && author.length > 0) {
-      const subQuery = ctx.app
-        .db("users")
+      const subQuery = db("users")
         .select("id")
         .whereIn("username", author)
 
@@ -125,13 +117,11 @@ module.exports = {
     }
 
     if (favorited && favorited.length > 0) {
-      const subQuery = ctx.app
-        .db("favorites")
+      const subQuery = db("favorites")
         .select("article")
         .whereIn(
           "user",
-          ctx.app
-            .db("users")
+          db("users")
             .select("id")
             .whereIn("username", favorited),
         )
@@ -141,13 +131,11 @@ module.exports = {
     }
 
     if (tag && tag.length > 0) {
-      const subQuery = ctx.app
-        .db("articles_tags")
+      const subQuery = db("articles_tags")
         .select("article")
         .whereIn(
           "tag",
-          ctx.app
-            .db("tags")
+          db("tags")
             .select("id")
             .whereIn("name", tag),
         )
@@ -217,16 +205,16 @@ module.exports = {
     }
 
     try {
-      await ctx.app
-        .db("articles")
-        .insert(humps.decamelizeKeys(_.omit(article, ["tagList"])))
+      await db("articles").insert(
+        humps.decamelizeKeys(_.omit(article, ["tagList"])),
+      )
     } catch (err) {
       if (Number(err.errno) === 19 || Number(err.code) === 23505) {
         article.slug = article.slug + "-" + uuid().substr(-6)
 
-        await ctx.app
-          .db("articles")
-          .insert(humps.decamelizeKeys(_.omit(article, ["tagList"])))
+        await db("articles").insert(
+          humps.decamelizeKeys(_.omit(article, ["tagList"])),
+        )
       } else {
         throw err
       }
@@ -235,7 +223,7 @@ module.exports = {
     if (tags && tags.length) {
       for (var i = 0; i < tags.length; i++) {
         try {
-          await ctx.app.db("tags").insert(humps.decamelizeKeys(tags[i]))
+          await db("tags").insert(humps.decamelizeKeys(tags[i]))
         } catch (err) {
           if (Number(err.errno) !== 19 && Number(err.code) !== 23505) {
             throw err
@@ -243,8 +231,7 @@ module.exports = {
         }
       }
 
-      tags = await ctx.app
-        .db("tags")
+      tags = await db("tags")
         .select()
         .whereIn("name", tags.map(t => t.name))
 
@@ -254,7 +241,7 @@ module.exports = {
         article: article.id,
       }))
 
-      await ctx.app.db("articles_tags").insert(relations)
+      await db("articles_tags").insert(relations)
     }
 
     article.favorited = false
@@ -289,8 +276,7 @@ module.exports = {
     newArticle.updatedAt = new Date().toISOString()
 
     try {
-      await ctx.app
-        .db("articles")
+      await db("articles")
         .update(
           humps.decamelizeKeys(
             _.pick(newArticle, [
@@ -307,8 +293,7 @@ module.exports = {
       if (Number(err.errno) === 19 || Number(err.code) === 23505) {
         newArticle.slug = newArticle.slug + "-" + uuid().substr(-6)
 
-        await ctx.app
-          .db("articles")
+        await db("articles")
           .update(
             humps.decamelizeKeys(
               _.pick(newArticle, [
@@ -327,8 +312,7 @@ module.exports = {
     }
 
     if (fields.tagList && fields.tagList.length === 0) {
-      await ctx.app
-        .db("articles_tags")
+      await db("articles_tags")
         .del()
         .where({ article: article.id })
     }
@@ -338,8 +322,7 @@ module.exports = {
         _.difference(article.tagList).length ||
         _.difference(fields.tagList).length
       ) {
-        await ctx.app
-          .db("articles_tags")
+        await db("articles_tags")
           .del()
           .where({ article: article.id })
 
@@ -351,7 +334,7 @@ module.exports = {
 
         for (var i = 0; i < tags.length; i++) {
           try {
-            await ctx.app.db("tags").insert(humps.decamelizeKeys(tags[i]))
+            await db("tags").insert(humps.decamelizeKeys(tags[i]))
           } catch (err) {
             if (Number(err.errno) !== 19 && Number(err.code) !== 23505) {
               throw err
@@ -359,8 +342,7 @@ module.exports = {
           }
         }
 
-        tags = await ctx.app
-          .db("tags")
+        tags = await db("tags")
           .select()
           .whereIn("name", tags.map(t => t.name))
 
@@ -370,7 +352,7 @@ module.exports = {
           article: article.id,
         }))
 
-        await ctx.app.db("articles_tags").insert(relations)
+        await db("articles_tags").insert(relations)
       }
     }
 
@@ -387,16 +369,15 @@ module.exports = {
     }
 
     await Promise.all([
-      ctx.app
-        .db("favorites")
+      db("favorites")
         .del()
         .where({ user: ctx.state.user.id, article: article.id }),
-      ctx.app
-        .db("articles_tags")
+
+      db("articles_tags")
         .del()
         .where({ article: article.id }),
-      ctx.app
-        .db("articles")
+
+      db("articles")
         .del()
         .where({ id: article.id }),
     ])
@@ -409,14 +390,12 @@ module.exports = {
       const { user } = ctx.state
       const { offset, limit } = ctx.query
 
-      const followedQuery = ctx.app
-        .db("followers")
+      const followedQuery = db("followers")
         .pluck("user")
         .where({ follower: user.id })
 
       let [articles, [countRes]] = await Promise.all([
-        ctx.app
-          .db("articles")
+        db("articles")
           .select(
             ...getSelect("articles", "article", articleFields),
             ...getSelect("users", "author", userFields),
@@ -438,8 +417,7 @@ module.exports = {
             )
           }),
 
-        ctx.app
-          .db("articles")
+        db("articles")
           .count()
           .whereIn("author", followedQuery),
       ])
@@ -471,13 +449,12 @@ module.exports = {
       }
 
       await Promise.all([
-        ctx.app.db("favorites").insert({
+        db("favorites").insert({
           id: uuid(),
           user: ctx.state.user.id,
           article: article.id,
         }),
-        ctx.app
-          .db("articles")
+        db("articles")
           .increment("favorites_count", 1)
           .where({ id: article.id }),
       ])
@@ -497,12 +474,10 @@ module.exports = {
       }
 
       await Promise.all([
-        ctx.app
-          .db("favorites")
+        db("favorites")
           .del()
           .where({ user: ctx.state.user.id, article: article.id }),
-        ctx.app
-          .db("articles")
+        db("articles")
           .decrement("favorites_count", 1)
           .where({ id: article.id }),
       ])

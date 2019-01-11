@@ -1,6 +1,5 @@
 const config = require("config")
 const Koa = require("koa")
-const db = require("./db")
 
 const app = new Koa()
 
@@ -20,7 +19,6 @@ const pagerMiddleware = require("../middleware/pager-middleware")
 const userMiddleware = require("../middleware/user-middleware")
 const routes = require("../routes")
 
-app.db = db
 app.use(responseTime())
 app.use(helmet())
 

@@ -1,6 +1,8 @@
+const db = require("../lib/db")
+
 module.exports = {
   async get(ctx) {
-    const tags = await ctx.app.db("tags").pluck("name")
+    const tags = await db("tags").pluck("name")
 
     ctx.body = { tags }
   },

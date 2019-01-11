@@ -4,6 +4,7 @@ const _ = require("lodash")
 const bcrypt = require("bcrypt")
 const { ValidationError } = require("../lib/errors")
 const { generateJWTforUser } = require("../lib/utils")
+const db = require("../lib/db")
 
 module.exports = {
   async get(ctx) {
@@ -23,7 +24,7 @@ module.exports = {
 
     user.password = await bcrypt.hash(user.password, 10)
 
-    await ctx.app.db("users").insert(humps.decamelizeKeys(user))
+    await db("users").insert(humps.decamelizeKeys(user))
 
     user = generateJWTforUser(user)
 
@@ -48,8 +49,7 @@ module.exports = {
 
     user.updatedAt = new Date().toISOString()
 
-    await ctx.app
-      .db("users")
+    await db("users")
       .where({ id: user.id })
       .update(humps.decamelizeKeys(user))
 
@@ -68,8 +68,7 @@ module.exports = {
       )
     }
 
-    let user = await ctx.app
-      .db("users")
+    let user = await db("users")
       .first()
       .where({ email: body.user.email })
 

@@ -1,9 +1,9 @@
 const _ = require("lodash")
 const uuid = require("uuid")
-
 const { getSelect } = require("../lib/utils")
 const { userFields, relationsMaps } = require("../lib/relations-map")
 const joinJs = require("join-js").default
+const db = require("../lib/db")
 
 module.exports = {
   async byUsername(username, ctx, next) {
@@ -13,8 +13,7 @@ module.exports = {
 
     const { user } = ctx.state
 
-    ctx.params.profile = await ctx.app
-      .db("users")
+    ctx.params.profile = await db("users")
       .select(
         ...getSelect("users", "profile", userFields),
         "followers.id as profile_following",
@@ -68,7 +67,7 @@ module.exports = {
         }
 
         try {
-          await ctx.app.db("followers").insert(follow)
+          await db("followers").insert(follow)
         } catch (err) {
           if (Number(err.errno) !== 19 && Number(err.code) !== 23505) {
             throw err
@@ -90,8 +89,7 @@ module.exports = {
         return
       }
 
-      await ctx.app
-        .db("followers")
+      await db("followers")
         .where({ user: profile.id, follower: user.id })
         .del()
 

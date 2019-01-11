@@ -2,12 +2,13 @@ const humps = require("humps")
 const uuid = require("uuid")
 const _ = require("lodash")
 const { getSelect } = require("../lib/utils")
+const joinJs = require("join-js").default
+const db = require("../lib/db")
 const {
   commentFields,
   userFields,
   relationsMaps,
 } = require("../lib/relations-map")
-const joinJs = require("join-js").default
 
 module.exports = {
   async byComment(comment, ctx, next) {
@@ -15,8 +16,7 @@ module.exports = {
       ctx.throw(404)
     }
 
-    comment = await ctx.app
-      .db("comments")
+    comment = await db("comments")
       .first()
       .where({ id: comment })
 
@@ -33,8 +33,7 @@ module.exports = {
     const { user } = ctx.state
     const { article } = ctx.params
 
-    let comments = await ctx.app
-      .db("comments")
+    let comments = await db("comments")
       .select(
         ...getSelect("comments", "comment", commentFields),
         ...getSelect("users", "author", userFields),
@@ -73,7 +72,7 @@ module.exports = {
 
     comment = await ctx.app.schemas.comment.validate(comment, opts)
 
-    await ctx.app.db("comments").insert(humps.decamelizeKeys(comment))
+    await db("comments").insert(humps.decamelizeKeys(comment))
 
     comment.author = _.pick(user, ["username", "bio", "image", "id"])
 
@@ -83,8 +82,7 @@ module.exports = {
   async del(ctx) {
     const { comment } = ctx.params
 
-    await ctx.app
-      .db("comments")
+    await db("comments")
       .del()
       .where({ id: comment.id })
 
