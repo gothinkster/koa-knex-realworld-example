@@ -74,7 +74,7 @@ module.exports = {
 
     if (!user) {
       ctx.throw(
-        422,
+        401,
         new ValidationError(['is invalid'], '', 'email or password')
       )
     }
@@ -83,7 +83,7 @@ module.exports = {
 
     if (!isValid) {
       ctx.throw(
-        422,
+        401,
         new ValidationError(['is invalid'], '', 'email or password')
       )
     }
