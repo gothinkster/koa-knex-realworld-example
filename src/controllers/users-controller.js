@@ -64,7 +64,7 @@ module.exports = {
     ctx.assert(
       _.isObject(body.user) && body.user.email && body.user.password,
       422,
-      new ValidationError(["is invalid"], "", "email or password"),
+      new ValidationError(["malformed request"], "", "email or password"),
     )
 
     let user = await db("users")
@@ -73,7 +73,7 @@ module.exports = {
 
     ctx.assert(
       user,
-      422,
+      401,
       new ValidationError(["is invalid"], "", "email or password"),
     )
 
@@ -81,7 +81,7 @@ module.exports = {
 
     ctx.assert(
       isValid,
-      422,
+      401,
       new ValidationError(["is invalid"], "", "email or password"),
     )
 
