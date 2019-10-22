@@ -4,7 +4,7 @@ server:
   domain: DOMAIN
 
 env:
-  enviroinment: ENVIROINMENT
+  environment: ENVIRONMENT
   logLevel: LOG_LEVEL
   name: npm_package_name
   version: npm_package_version

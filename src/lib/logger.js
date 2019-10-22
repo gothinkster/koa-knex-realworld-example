@@ -21,7 +21,7 @@ const opts = {
   serializers,
   base: {
     NODE_ENV: process.env.NODE_ENV,
-    environment: config.get("env.enviroinment"),
+    environment: config.get("env.environment"),
     version: config.get("env.version"),
     name: config.get("env.name"),
     pid: process.pid,

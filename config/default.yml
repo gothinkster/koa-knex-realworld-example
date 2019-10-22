@@ -4,7 +4,7 @@ server:
   domain: example.com
 
 env:
-  enviroinment: local
+  environment: local
   logLevel: info
   name: app
   version: 0.0.0
