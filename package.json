@@ -74,7 +74,7 @@
     "koa-response-time": "^2.1.0",
     "koa-router": "^7.4.0",
     "koa-x-request-id": "^2.0.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.19",
     "mississippi": "^3.0.0",
     "p-event": "^2.1.0",
     "pg": "^7.7.1",
